@@ -7,69 +7,49 @@
   <meta name="robots" content="noindex, nofollow" />
   <style>
     :root{
-      --base:#477374;   /* main background */
-      --blob:#bcbcac;   /* liquid blob */
-      --mx:50%;
-      --my:50%;
-      --blobSize:10vmax; /* tiny at rest; JS animates this */
+      --c1:#477374;   /* main brand color */
+      --c2:#bcbcac;   /* secondary brand color */
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{ box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; }
     body{
       margin:0;
-      color:#eef2f1;
+      color:#ffffff;
       font:16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       display:grid;
       place-items:center;
-      overflow:hidden;
-      background:var(--base); /* no white */
+
+      /* --- Animated gradient between TWO colors (repeated for smooth cycling) --- */
+      background: linear-gradient(-45deg, var(--c1), var(--c2), var(--c1), var(--c2));
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient{
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Mouse-driven liquid gradient (size controlled by --blobSize) */
-    .liquid{
-      position:fixed; inset:-15vmax; pointer-events:none; z-index:-2;
-      filter:blur(60px) saturate(1.05);
-      transform:translateZ(0);
-      background:
-        radial-gradient(var(--blobSize) var(--blobSize) at var(--mx) var(--my),
-          color-mix(in oklab, var(--blob) 88%, var(--base) 12%) 0 30%, transparent 65%),
-        radial-gradient(calc(var(--blobSize) * .75) calc(var(--blobSize) * .75) at
-          calc((var(--mx)) - 12%) calc((var(--my)) + 8%),
-          color-mix(in oklab, var(--blob) 40%, var(--base) 60%) 0 22%, transparent 55%);
-      opacity:.85;
-    }
-
-    /* Subtle noise texture (no white) */
-    .noise{
-      position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.07; mix-blend-mode:soft-light;
-      background-image:url("data:image/svg+xml;utf8,\
-        <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>\
-          <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter>\
-          <rect width='100%%' height='100%%' filter='url(#n)' fill='none' opacity='0.8'/>\
-        </svg>");
-      background-size:220px 220px;
-      animation: grain 1.8s steps(6) infinite;
-    }
-    @keyframes grain{ 0%{background-position:0 0} 100%{background-position:140px 140px} }
-
+    /* Card */
     .card{
       width:min(420px, 92vw);
-      background:rgba(0,0,0,.22); /* darker glass, no white */
-      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.18);
       backdrop-filter:saturate(1.05) blur(10px);
       -webkit-backdrop-filter:saturate(1.05) blur(10px);
       border-radius:18px;
       padding:28px 24px 22px;
       box-shadow:0 12px 36px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.22);
     }
-    h1{ font-size:1.35rem; margin:0 0 .4rem; letter-spacing:.2px }
-    p.hint{ margin:.2rem 0 1.25rem; color:#d7e6e4; font-size:.95rem }
+    h1{ font-size:1.35rem; margin:0 0 .45rem; letter-spacing:.2px; }
+    p.hint{ margin:.2rem 0 1.25rem; color:#f2f6f5; font-size:.95rem; opacity:.9; }
 
+    /* Password field */
     .field{
       position:relative; display:flex; align-items:center;
-      border:1px solid rgba(255,255,255,.25);
-      background:rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.30);
+      background:rgba(0,0,0,.30);
       border-radius:12px; padding:2px 2px 2px 10px;
     }
     .field input{
@@ -77,8 +57,9 @@
       font-size:1rem; padding:.85rem .85rem;
       background:transparent; color:#ffffff; /* input text white */
     }
-    .field input::placeholder{ color:#ffffff; opacity:.9; } /* placeholder white */
+    .field input::placeholder{ color:#ffffff; opacity:.95; } /* placeholder white */
 
+    /* Eye toggle button */
     .icon-btn{
       display:grid; place-items:center;
       width:40px; height:40px;
@@ -101,13 +82,10 @@
     .action:active{ transform:translateY(1px) }
 
     .msg{ min-height:1.25rem; margin:.7rem 2px 0; color:#ffd3d3; font-size:.92rem }
-    .brand{ margin-top:18px; font-size:.82rem; color:#cfe1df; text-align:center }
+    .brand{ margin-top:18px; font-size:.82rem; color:#e8f0ef; text-align:center }
   </style>
 </head>
 <body>
-  <div class="liquid" aria-hidden="true"></div>
-  <div class="noise"  aria-hidden="true"></div>
-
   <main class="card" role="dialog" aria-labelledby="title" aria-describedby="hint">
     <h1 id="title">Get your access</h1>
     <p class="hint" id="hint">Enter the password to proceed.</p>
@@ -139,7 +117,6 @@
     const TARGET_URL = "https://oikos-projects-on-sale-gplha3l.gamma.site/"; // paste your real link
     // =================================
 
-    const root   = document.documentElement;
     const pw     = document.getElementById('pw');
     const msgEl  = document.getElementById('msg');
     const eyeOn  = document.getElementById('eye-on');
@@ -167,52 +144,6 @@
       toggle.title = hidden ? 'Hide password' : 'Show password';
       pw.focus({preventScroll:true});
     });
-
-    // ===== Ripple-like, speed-based blob sizing =====
-    let lastX = window.innerWidth / 2;
-    let lastY = window.innerHeight / 2;
-    let lastT = performance.now();
-    let currentSize = 10;  // vmin base
-    let targetSize  = 10;  // vmin target updated by mouse speed
-
-    // Ease size back to base; quick expand on fast moves
-    function animate(){
-      // ease currentSize toward targetSize
-      currentSize += (targetSize - currentSize) * 0.12; // smoothing
-      // slowly decay target toward base (10)
-      targetSize += (10 - targetSize) * 0.04;
-
-      root.style.setProperty('--blobSize', currentSize + 'vmin');
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-
-    function setMouse(x, y){
-      const px = (x / window.innerWidth)  * 100;
-      const py = (y / window.innerHeight) * 100;
-      root.style.setProperty('--mx', px + '%');
-      root.style.setProperty('--my', py + '%');
-
-      const now = performance.now();
-      const dt  = Math.max(8, now - lastT); // ms
-      const dx  = x - lastX;
-      const dy  = y - lastY;
-      const dist = Math.hypot(dx, dy);      // pixels moved since last event
-      const speed = dist / dt;              // px per ms
-
-      // Map speed to a size “burst” (tiny → small → medium), clamp to keep it tasteful.
-      // Base is 10vmin; add up to ~24vmin on very fast moves.
-      const burst = Math.min(24, speed * 22); // tune multiplier for feel
-      targetSize = 10 + burst;
-
-      lastX = x; lastY = y; lastT = now;
-    }
-
-    // init center
-    setMouse(window.innerWidth/2, window.innerHeight/2);
-
-    window.addEventListener('mousemove', e => setMouse(e.clientX, e.clientY), {passive:true});
-    window.addEventListener('resize', () => setMouse(window.innerWidth/2, window.innerHeight/2));
   </script>
 </body>
 </html>
