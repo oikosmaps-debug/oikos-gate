@@ -2,52 +2,201 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Client Access – Oikos Property Developments</title>
+  <title>Get your access – Oikos Property Developments</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
   <style>
-    body {font-family: system-ui, Arial, sans-serif; display:flex; min-height:100vh; margin:0; background:#0b132b; color:#fff; align-items:center; justify-content:center;}
-    .card {background:#1c2541; padding:28px; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,.25); width:min(92vw,420px); text-align:center;}
-    h1 {font-size:1.3rem; margin:0 0 12px;}
-    p {opacity:.8; margin:.25rem 0 1rem;}
-    input {width:100%; padding:.75rem .9rem; font-size:1rem; border-radius:10px; border:1px solid #3a506b; background:#0b132b; color:#fff; outline:none;}
-    button {margin-top:.75rem; width:100%; padding:.8rem 1rem; border:0; border-radius:10px; font-weight:600; cursor:pointer;}
-    .primary {background:#5bc0be; color:#051923;}
-    .msg {min-height:1.2rem; margin-top:.65rem; color:#ffb4b4;}
-    small {display:block; margin-top:10px; opacity:.6;}
+    :root{
+      --c1:#477374;
+      --c2:#bcbcac;
+      --text:#0d0f10;
+      --card:rgba(255,255,255,.72);
+      --stroke:rgba(0,0,0,.08);
+      --accent:#477374;
+    }
+
+    /* Page reset */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      font:16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      background:#f6f7f7;
+    }
+
+    /* Animated blurred gradient backdrop */
+    .backdrop,
+    .backdrop::before,
+    .backdrop::after{
+      position:fixed; inset:-20vmax;
+      content:"";
+      z-index:-2;
+      filter:blur(60px);
+      transform:translateZ(0);
+    }
+    .backdrop{
+      background:
+        radial-gradient(55vmax 55vmax at 20% 25%, var(--c1) 0 35%, transparent 60%),
+        radial-gradient(55vmax 55vmax at 85% 70%, var(--c2) 0 35%, transparent 60%);
+      animation: drift 18s ease-in-out infinite alternate;
+      opacity:.85;
+    }
+    .backdrop::before{
+      background:
+        radial-gradient(40vmax 40vmax at 80% 10%, color-mix(in oklab, var(--c1) 70%, white) 0 35%, transparent 60%),
+        radial-gradient(45vmax 45vmax at 10% 80%, color-mix(in oklab, var(--c2) 70%, white) 0 35%, transparent 60%);
+      animation: drift2 22s ease-in-out infinite alternate-reverse;
+      opacity:.55;
+    }
+    /* subtle monochrome noise overlay */
+    .backdrop::after{
+      z-index:-1;
+      filter:none;
+      opacity:.08;
+      background-image:url("data:image/svg+xml;utf8,\
+        <svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>\
+        <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter>\
+        <rect width='100%%' height='100%%' filter='url(#n)' opacity='0.6'/>\
+        </svg>");
+      background-size:220px 220px;
+      animation: grain 1.8s steps(6) infinite;
+    }
+
+    @keyframes drift{
+      0% {transform:translate(-2%, -2%) scale(1.02) rotate(-1deg)}
+      100%{transform:translate(2%, 2%)  scale(1.05) rotate(1deg)}
+    }
+    @keyframes drift2{
+      0% {transform:translate(3%, -3%) scale(1.02) rotate(2deg)}
+      100%{transform:translate(-3%, 3%) scale(1.06) rotate(-2deg)}
+    }
+    @keyframes grain{
+      0%{background-position:0 0}
+      100%{background-position:120px 120px}
+    }
+
+    /* Card */
+    .card{
+      width:min(420px, 92vw);
+      background:var(--card);
+      border:1px solid var(--stroke);
+      backdrop-filter:saturate(1.1) blur(8px);
+      -webkit-backdrop-filter:saturate(1.1) blur(8px);
+      border-radius:18px;
+      padding:28px 24px 22px;
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.45);
+    }
+    h1{
+      font-size:1.35rem;
+      letter-spacing:.2px;
+      margin:0 0 .35rem;
+    }
+    p.hint{
+      margin:.15rem 0 1.25rem;
+      color:#4b4e51;
+      font-size:.95rem;
+    }
+    .field{
+      position:relative;
+      display:flex;
+      align-items:center;
+      border:1px solid var(--stroke);
+      background:#fff;
+      border-radius:12px;
+      padding:2px 2px 2px 10px;
+    }
+    .field input{
+      border:0; outline:0; flex:1;
+      font-size:1rem; padding:.8rem .8rem;
+      background:transparent; color:#111;
+    }
+    .icon-btn{
+      display:grid; place-items:center;
+      width:40px; height:40px;
+      border-radius:10px; border:0;
+      background:#f1f2f3; cursor:pointer;
+      transition:background .15s ease;
+    }
+    .icon-btn:hover{ background:#e7e8ea }
+    .action{
+      margin-top:12px;
+      width:100%;
+      padding:.9rem 1rem;
+      border-radius:12px; border:0;
+      font-weight:600; cursor:pointer;
+      color:white; background:var(--accent);
+    }
+    .msg{min-height:1.25rem; margin:.65rem 2px 0; color:#b01616; font-size:.92rem}
+    .brand{margin-top:18px; font-size:.82rem; color:#5a5d60; text-align:center}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Client Access</h1>
-    <p>Enter the password to view the site.</p>
-    <input type="password" id="pw" placeholder="Password" autocomplete="current-password" />
-    <button class="primary" id="go">Enter</button>
-    <div class="msg" id="msg"></div>
-    <small>Oikos Property Developments</small>
-  </div>
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <main class="card" role="dialog" aria-labelledby="title" aria-describedby="hint">
+    <h1 id="title">Get your access</h1>
+    <p class="hint" id="hint">Enter the password to proceed.</p>
+
+    <label class="field" aria-label="Password field">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password" inputmode="text" />
+      <button id="toggle" class="icon-btn" type="button" aria-label="Show password" title="Show password">
+        <!-- eye icon -->
+        <svg id="eye-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#202224" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <!-- eye-off (hidden initially) -->
+        <svg id="eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#202224" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none" aria-hidden="true">
+          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.64 21.64 0 0 1-3.22 4.24"/>
+          <path d="M1 1l22 22"/>
+        </svg>
+      </button>
+    </label>
+
+    <button id="enter" class="action" type="button">Enter</button>
+    <div id="msg" class="msg" role="status" aria-live="polite"></div>
+    <div class="brand">Oikos Property Developments</div>
+  </main>
 
   <script>
-    const PASSWORD_HASH = "032a4de7de184aabe37f7fc059df9bb29ee93d988582b04a6a144a09e6349f95"; // SHA-256("Oikos2025")
-    const TARGET_URL = "https://oikos-projects-on-sale-gplha3l.gamma.site/"; // ← paste your Gamma/site link
+    // TODO: set your password and target URL
+    const PASSWORD = "oikosmarketing2025"; // change if desired
+    const TARGET_URL = "https://oikos-projects-on-sale-gplha3l.gamma.site/"; // ← paste your real link
 
-    async function sha256(text) {
-      const data = new TextEncoder().encode(text);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join('');
-    }
+    const pwInput = document.getElementById('pw');
+    const msgEl = document.getElementById('msg');
+    const eyeOn = document.getElementById('eye-on');
+    const eyeOff = document.getElementById('eye-off');
+    const toggleBtn = document.getElementById('toggle');
 
-    async function check() {
-      const input = document.getElementById('pw').value.trim();
-      const hash = await sha256(input);
-      if (hash === PASSWORD_HASH) {
+    function validate(){
+      const ok = pwInput.value.trim() === PASSWORD;
+      if(ok){
         window.location.replace(TARGET_URL);
       } else {
-        document.getElementById('msg').textContent = "Wrong password. Try again.";
+        msgEl.textContent = "Wrong password. Try again.";
       }
     }
-    document.getElementById('go').addEventListener('click', check);
-    document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+
+    // Show / hide password
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      eyeOn.style.display  = isHidden ? 'none' : 'block';
+      eyeOff.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      toggleBtn.title = isHidden ? 'Hide password' : 'Show password';
+      pwInput.focus({preventScroll:true});
+    });
+
+    document.getElementById('enter').addEventListener('click', validate);
+    pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') validate(); });
   </script>
 </body>
 </html>
