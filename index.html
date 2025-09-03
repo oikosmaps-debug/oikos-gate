@@ -112,38 +112,51 @@
   </main>
 
   <script>
-    // ====== CONFIG (edit these) ======
-    const PASSWORD   = "oikosmarketing2025";                 // change if desired
-    const TARGET_URL = "https://oikos-projects-on-sale-gplha3l.gamma.site/"; // paste your real link
-    // =================================
+  // ===== CONFIG (hashed password only) =====
+  // SHA-256 hash of: "oikosmarketing2025"
+  const PASSWORD_HASH = "cffce62ddef8694f3b1b9715812c3e74415879a0a448cc4bb7c56e359433521b";
+  const TARGET_URL = "https://oikos-projects-on-sale-gplha31.gamma.site/"; // leave as-is
+  // ========================================
 
-    const pw     = document.getElementById('pw');
-    const msgEl  = document.getElementById('msg');
-    const eyeOn  = document.getElementById('eye-on');
-    const eyeOff = document.getElementById('eye-off');
-    const toggle = document.getElementById('toggle');
+  // Keep your existing element references
+  const pw     = document.getElementById('pw');
+  const msgEl  = document.getElementById('msg');
+  const eyeOn  = document.getElementById('eye-on');
+  const eyeOff = document.getElementById('eye-off');
+  const toggle = document.getElementById('toggle');
 
-    // Redirect check
-    function validate(){
-      if (pw.value.trim() === PASSWORD) {
-        window.location.replace(TARGET_URL);
-      } else {
-        msgEl.textContent = "Wrong password. Try again.";
-      }
+  // Helper: SHA-256 (Web Crypto API)
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Validation: compare hash instead of plain text
+  async function validate() {
+    const entered = pw.value.trim();
+    const hash = await sha256(entered);
+    if (hash === PASSWORD_HASH) {
+      window.location.replace(TARGET_URL);
+    } else {
+      msgEl.textContent = "Wrong password. Try again.";
     }
-    document.getElementById('enter').addEventListener('click', validate);
-    pw.addEventListener('keydown', e => { if(e.key === 'Enter') validate(); });
+  }
 
-    // Eye toggle
-    toggle.addEventListener('click', () => {
-      const hidden = pw.type === 'password';
-      pw.type = hidden ? 'text' : 'password';
-      eyeOn.style.display  = hidden ? 'none' : 'block';
-      eyeOff.style.display = hidden ? 'block' : 'none';
-      toggle.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
-      toggle.title = hidden ? 'Hide password' : 'Show password';
-      pw.focus({preventScroll:true});
-    });
-  </script>
+  // Hook up your existing events
+  document.getElementById('enter').addEventListener('click', validate);
+  pw.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+
+  // Eye toggle (unchanged)
+  toggle.addEventListener('click', () => {
+    const hidden = pw.type === 'password';
+    pw.type = hidden ? 'text' : 'password';
+    eyeOn.style.display  = hidden ? 'none' : 'block';
+    eyeOff.style.display = hidden ? 'block' : 'none';
+    toggle.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+    toggle.title = hidden ? 'Hide password' : 'Show password';
+    pw.focus({preventScroll:true});
+  });
+</script>
 </body>
 </html>
